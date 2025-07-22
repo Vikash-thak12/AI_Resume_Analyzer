@@ -1,12 +1,18 @@
 import React, { useState } from 'react'
+import FileUploader from '~/components/FileUploader';
 import Navbar from '~/components/Navbar'
 
 const upload = () => {
     const [isProcessing, setIsProcessing] = useState(false);
     const [statusText, setStatusText] = useState('');
+    const [file, setFile] = useState<File | null>(null)
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+    }
+
+    const handleFileSelet = ( file: File | null) => {
+        setFile(file); 
     }
 
 
@@ -44,7 +50,7 @@ const upload = () => {
 
                                 <div className='form-div'>
                                     <label htmlFor="uploader">Upload Resume</label>
-                                    <div>Uploader</div>
+                                    <FileUploader onFileSelect={handleFileSelet} />
                                 </div>
 
                                 <button className='primary-button' type='submit'>
