@@ -45,7 +45,7 @@ const FileUploader = ({ onFileSelect }: FileUploaderProps) => {
                             <button
                                 className="p-2 cursor-pointer"
                                 onClick={(e) => {
-                                    e.stopPropagation(); // prevent re-triggering dropzone
+                                    // e.stopPropagation(); // prevent re-triggering dropzone
                                     setSelectedFile(null);
                                     onFileSelect?.(null);
                                 }}
