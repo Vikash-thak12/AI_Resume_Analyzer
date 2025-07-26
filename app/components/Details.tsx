@@ -110,7 +110,7 @@ const Details = ({ feedback }: { feedback: Feedback }) => {
   return (
     <div className="flex flex-col gap-4 w-full">
       <Accordion>
-        {/* <AccordionItem id="tone-style">
+        <AccordionItem id="tone-style">
           <AccordionHeader itemId="tone-style">
             <CategoryHeader
               title="Tone & Style"
@@ -120,7 +120,7 @@ const Details = ({ feedback }: { feedback: Feedback }) => {
           <AccordionContent itemId="tone-style">
             <CategoryContent tips={feedback.toneAndStyle.tips} />
           </AccordionContent>
-        </AccordionItem> */}
+        </AccordionItem>
         <AccordionItem id="content">
           <AccordionHeader itemId="content">
             <CategoryHeader
