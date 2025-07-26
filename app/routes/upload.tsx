@@ -1,5 +1,5 @@
 import { prepareInstructions } from '../../constants';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router';
 import FileUploader from '~/components/FileUploader';
 import Navbar from '~/components/Navbar'
@@ -8,18 +8,19 @@ import { usePuterStore } from '~/lib/puter';
 import { generateUUID } from '~/lib/utils';
 
 interface resumeProps {
-    companyName: String,
-    jobTitle: String,
-    jobDescription: String,
+    companyName: string,
+    jobTitle: string,
+    jobDescription: string,
     file: File
 }
 
-const upload = () => {
+const Upload = () => {
     const { auth, isLoading, fs, ai, kv } = usePuterStore();
     const navigate = useNavigate();
     const [isProcessing, setIsProcessing] = useState(false);
     const [statusText, setStatusText] = useState('');
     const [file, setFile] = useState<File | null>(null)
+
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -27,11 +28,11 @@ const upload = () => {
         if (!form) return;
         const formData = new FormData(form);
 
-        const companyName = formData.get('company-name') as String;
-        const jobTitle = formData.get('job-title') as String;
-        const jobDescription = formData.get('job-description') as String;
+        const companyName = formData.get('company-name') as string;
+        const jobTitle = formData.get('job-title') as string;
+        const jobDescription = formData.get('job-description') as string;
 
-        console.log(file)
+        // console.log(file)
 
         if (!file) return;
         handleAnalyze({ companyName, jobTitle, jobDescription, file })
@@ -51,7 +52,7 @@ const upload = () => {
         // uploading the image 
         setStatusText("Uploading the image...");
         const uploadedImage = await fs.upload([imageFile.file]);
-        if (!uploadedFile) return setStatusText("Failed to upload the image...");
+        if (!uploadedImage) return setStatusText("Failed to upload the image...");
 
 
         setStatusText("Preparing Data...");
@@ -69,23 +70,24 @@ const upload = () => {
         await kv.set(`resume:${uuid}`, JSON.stringify(data)); // stroing in putter in key value pair 
         setStatusText("Analyzing the resume...")
 
-        const feedback = await ai.feedback(
-            uploadedFile.path,
-            prepareInstructions({ jobTitle, jobDescription })
-        )
+        const feedback = await ai.feedback(uploadedFile.path, prepareInstructions({ jobTitle, jobDescription}));
+        // console.log("AI Feedback:", feedback);
 
-        if (!feedback) return setStatusText("Error: Failed to analyze resume...");
-        const feedbackText = feedback.message.content === 'string' ? feedback.message.content : feedback.message.content[0].text;
+        if (!feedback || !feedback.message?.content) {
+            setStatusText("Failed to get feedback from AI");
+            return;
+        }
 
+        const feedbackText = typeof feedback.message.content === 'string' ? feedback.message.content : feedback.message.content[0].text;
+        console.log("FeedBackText: ", feedbackText)
         data.feedback = JSON.parse(feedbackText);
         await kv.set(`resume:${uuid}`, JSON.stringify(data))
         setStatusText("Completed, redirecting you to another page....")
-        console.log(data)
-
-
+        console.log("Data", data)
+        navigate(`/resume/${uuid}`)
     }
 
-    const handleFileSelet = (file: File | null) => {
+    const handleFileSelect = (file: File | null) => {
         setFile(file);
     }
 
@@ -124,7 +126,7 @@ const upload = () => {
 
                                 <div className='form-div'>
                                     <label htmlFor="uploader">Upload Resume</label>
-                                    <FileUploader onFileSelect={handleFileSelet} />
+                                    <FileUploader onFileSelect={handleFileSelect} />
                                 </div>
 
                                 <button className='primary-button' type='submit'>
@@ -140,4 +142,4 @@ const upload = () => {
     )
 }
 
-export default upload
+export default Upload

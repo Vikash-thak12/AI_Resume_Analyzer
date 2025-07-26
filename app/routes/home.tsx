@@ -18,6 +18,19 @@ export default function Home() {
     const { auth} = usePuterStore();
     const navigate = useNavigate(); 
 
+    useEffect(() => {
+          const fetchUser = async () => {
+      try {
+        const user = await window.puter.auth.getUser();
+        console.log("Current User:", user);
+      } catch (err) {
+        console.error("Failed to fetch user:", err);
+      }
+    };
+
+    fetchUser();
+    },[])
+
 
     useEffect(() => {
         if(!auth.isAuthenticated) navigate('/auth?next=/')
